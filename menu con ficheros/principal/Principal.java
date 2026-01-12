@@ -1,4 +1,6 @@
-package principal;
+package menuFicherosProductos;
+
+
 
 import java.io.EOFException;
 import java.io.File;
@@ -9,6 +11,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+
+
 
 public class Principal {
 	public static void main(String[] args) throws Exception {
@@ -23,7 +30,7 @@ public class Principal {
 						 * si no existe el fichero, lo crea
 						 * el nombre del producto se lo pide al usuario, el stock es aleatorio
 						 */
-						altaVariosProductos();
+						altaUnProducto();
 						break;
 					case 2:
 						listado();
@@ -65,407 +72,397 @@ public class Principal {
 		}while (opc!=9);
 	}
 	
-		private static void altaUnProducto() {
-		    System.out.println("Introduce el nombre del producto:");
-		    String nombre = Util.introducirCadena();
+	private static void altaUnProducto() {
+		
 
-		    System.out.println("Introduce el stock del producto:");
-		    int stock = Util.leerInt();
+		
 
-		    Producto p = new Producto(nombre, stock);
+		File refFichero = new File("producto.dat");
 
-		    File refFichero = new File("productos.dat");
+		if (!refFichero.exists()) {
 
-		    try {
-		        if (!refFichero.exists()) {
-		            // Fichero NO existe → creamos uno nuevo con cabecera
-		            try (ObjectOutputStream oos =
-		                     new ObjectOutputStream(new FileOutputStream(refFichero))) {
-		                oos.writeObject(p);
-		            }
-		        } else {
-		            // Fichero SÍ existe → añadimos sin cabecera
-		            try (SinCabeceraObjectOutputStream oos =
-		                     new SinCabeceraObjectOutputStream(new FileOutputStream(refFichero, true))) {
-		                oos.writeObject(p);
-		            }
-		        }
+		    // Fichero NO existe → lo creamos con cabecera
+		    try (ObjectOutputStream productoOStream =
+		            new ObjectOutputStream(new FileOutputStream(refFichero))) {
 
-		        System.out.println("Producto añadido correctamente.");
-
-		    } catch (IOException e) {
-		        System.out.println("Error al dar de alta el producto: " + e.getMessage());
-		    }
-		}
-		private static void altaVariosProductos() {
-		    System.out.println("¿Cuántos productos quieres dar de alta?");
-		    int cantidad = Util.leerInt();
-
-		    File refFichero = new File("productos.dat");
-
-		    for (int i = 0; i < cantidad; i++) {
-
-		        System.out.println("\nIntroduce el nombre del producto " + (i + 1) + ":");
+		        System.out.print("Introduce el nombre del producto: ");
 		        String nombre = Util.introducirCadena();
 
-		        System.out.println("Introduce el stock del producto " + (i + 1) + ":");
+		        System.out.print("Introduce el stock del producto: ");
 		        int stock = Util.leerInt();
 
-		        Producto p = new Producto(nombre, stock);
+		        productoOStream.writeObject(new Producto(nombre, stock));
 
-		        try {
-		            if (!refFichero.exists() && i == 0) {
-		                // Si el fichero NO existe y es el primer producto → cabecera
-		                try (ObjectOutputStream oos =
-		                         new ObjectOutputStream(new FileOutputStream(refFichero))) {
-		                    oos.writeObject(p);
-		                }
-		            } else {
-		                // Si el fichero existe → añadir sin cabecera
-		                try (SinCabeceraObjectOutputStream oos =
-		                         new SinCabeceraObjectOutputStream(new FileOutputStream(refFichero, true))) {
-		                    oos.writeObject(p);
-		                }
-		            }
-
-		            System.out.println("Producto " + (i + 1) + " añadido correctamente.");
-
-		        } catch (IOException e) {
-		            System.out.println("Error al dar de alta el producto: " + e.getMessage());
-		        }
+		    } catch (IOException e) {
+		        System.out.println("Error de escritura: " + e.getMessage());
 		    }
+
+		} else {
+
+		    // Fichero SÍ existe → añadimos sin cabecera
+		    try (SinCabeceraObjectOutputStream productoOStream =
+		            new SinCabeceraObjectOutputStream(new FileOutputStream(refFichero, true))) {
+
+		        System.out.print("Introduce el nombre del producto: ");
+		        String nombre = Util.introducirCadena();
+
+		        System.out.print("Introduce el stock del producto: ");
+		        int stock = Util.leerInt();
+
+		        productoOStream.writeObject(new Producto(nombre, stock));
+		        System.out.println("Producto añadido al fichero existente");
+
+		    } catch (IOException e) {
+		        System.out.println("Error de escritura: " + e.getMessage());
+		    }}
 		}
 
+			
+	private static void altaMuchosProductos() {
+		
 
+		
+
+		File refFichero = new File("producto.dat");
+
+		if (!refFichero.exists()) {
+
+		    // Fichero NO existe → lo creamos con cabecera
+		    try (ObjectOutputStream productoOStream =
+		            new ObjectOutputStream(new FileOutputStream(refFichero))) {
+
+		        boolean seguir = true;
+
+		        while (seguir) {
+
+		            System.out.print("Introduce el nombre del producto: ");
+		            String nombre = Util.introducirCadena();
+
+		            System.out.print("Introduce el stock del producto: ");
+		            int stock = Util.leerInt();
+
+		            productoOStream.writeObject(new Producto(nombre, stock));
+
+		            System.out.println("Si quieres seguir introduciendo productos introduce 1");
+		            int continuar = Util.leerInt();
+
+		            if (continuar != 1) {
+		                seguir = false;
+		            }
+		        }
+
+		    } catch (IOException e) {
+		        System.out.println("Error de escritura: " + e.getMessage());
+		    }
+
+		} else {
+
+		    // Fichero SÍ existe → añadimos sin cabecera
+		    try (SinCabeceraObjectOutputStream productoOStream =
+		            new SinCabeceraObjectOutputStream(new FileOutputStream(refFichero, true))) {
+
+		        boolean seguir = true;
+
+		        while (seguir) {
+
+		            System.out.print("Introduce el nombre del producto: ");
+		            String nombre = Util.introducirCadena();
+
+		            System.out.print("Introduce el stock del producto: ");
+		            int stock = Util.leerInt();
+
+		            productoOStream.writeObject(new Producto(nombre, stock));
+
+		            System.out.println("Si quieres seguir introduciendo productos introduce 1");
+		            int continuar = Util.leerInt();
+		            
+
+		            if (continuar != 1) {
+		                seguir = false;
+		            }
+		        }
+
+		    } catch (IOException e) {
+		        System.out.println("Error de escritura: " + e.getMessage());
+		    }
+		}
 	}
+
+	
 	private static void listado() {
 		
-		    File refFichero = new File("productos.dat");
+			File refFichero=new File("producto.dat");
+			
+			// Lee el fichero
+			if (!refFichero.exists())
+			{
+				System.out.println("Fichero no existente");
+			}
+			else
+			{
+				try (FileInputStream fileIStream = new FileInputStream(refFichero);
+			             ObjectInputStream personaIStream = new ObjectInputStream(fileIStream)) 
+				{
+					while (true) {
+						try {
+							Producto aux = (Producto) personaIStream.readObject();
+							System.out.println(aux);  
+						} catch (EOFException eof) {
+							break;
+						}
+					}
 
-		    if (!refFichero.exists()) {
-		        System.out.println("No existe el fichero de productos.");
-		        return;
-		    }
-
-		    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(refFichero))) {
-
-		        System.out.println("\n--- LISTADO DE PRODUCTOS ---\n");
-
-		        while (true) {
-		            try {
-		                Producto p = (Producto) ois.readObject();
-		                System.out.println("Nombre: " + p.getNombre() + " | Stock: " + p.getStock());
-		            } catch (EOFException e) {
-		                // Fin del fichero → salimos del bucle
-		                break;
-		            }
-		        }
-
-		        System.out.println("\n--- FIN DEL LISTADO ---\n");
-
-		    } catch (FileNotFoundException e) {
-		        System.out.println("No se encuentra el fichero.");
-		    } catch (IOException e) {
-		        System.out.println("Error de lectura: " + e.getMessage());
-		    } catch (ClassNotFoundException e) {
-		        System.out.println("Error: clase Producto no encontrada.");
-		    }
+				} catch (Exception e) {
+					System.out.println("Error de lectura: "+e.getMessage());
+				}
+			}
 		}
 
-	}
+	
 	private static void modificacion()  {
-		
-		    File original = new File("productos.dat");
 
-		    if (!original.exists()) {
-		        System.out.println("No existe el fichero de productos.");
+
+		    File fichero = new File("producto.dat");
+
+		    // 1. Leer fichero y volcar a ArrayList
+		    ArrayList<Producto> aProductos = new ArrayList<>();
+
+		    if (!fichero.exists()) {
+		        System.out.println("Fichero no existente");
 		        return;
 		    }
 
-		    System.out.println("Introduce el nombre del producto a modificar:");
-		    String nombreBuscado = Util.introducirCadena();
-
-		    ArrayList<Producto> lista = new ArrayList<>();
-		    boolean encontrado = false;
-
-		    // 1. Leer todos los productos al ArrayList
-		    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(original))) {
+		    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichero))) {
 
 		        while (true) {
 		            try {
 		                Producto p = (Producto) ois.readObject();
-		                lista.add(p);
-		            } catch (EOFException e) {
+		                aProductos.add(p);
+		            } catch (EOFException eof) {
 		                break; // fin del fichero
 		            }
 		        }
 
-		    } catch (IOException | ClassNotFoundException e) {
-		        System.out.println("Error al leer el fichero: " + e.getMessage());
+		    } catch (Exception e) {
+		        System.out.println("Error leyendo fichero: " + e.getMessage());
 		        return;
 		    }
 
-		    // 2. Buscar y modificar
-		    for (Producto p : lista) {
+		    // 2. Buscar producto y modificarlo
+		    System.out.println("Introduce nombre del producto a modificar:");
+		    String nombreBuscado = Util.introducirCadena();
+
+		    boolean encontrado = false;
+
+		    for (Producto p : aProductos) {
 		        if (p.getNombre().equalsIgnoreCase(nombreBuscado)) {
-		            encontrado = true;
+		            System.out.println("Producto encontrado: " + p);
 
-		            System.out.println("Producto encontrado:");
-		            System.out.println("Nombre: " + p.getNombre());
-		            System.out.println("Stock actual: " + p.getStock());
-
-		            System.out.println("Introduce el nuevo stock:");
+		            System.out.println("Introduce nuevo stock:");
 		            int nuevoStock = Util.leerInt();
-
 		            p.setStock(nuevoStock);
+
+		            encontrado = true;
 		            break;
 		        }
 		    }
 
 		    if (!encontrado) {
-		        System.out.println("No existe ningún producto con ese nombre.");
+		        System.out.println("Producto no encontrado");
 		        return;
 		    }
 
-		    // 3. Crear fichero auxiliar
-		    File auxiliar = new File("auxiliar.dat");
+		    // 3. Volcar en fichero auxiliar
+		    File aux = new File("producto_aux.dat");
 
-		    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(auxiliar))) {
-		        for (Producto p : lista) {
+		    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(aux))) {
+
+		        for (Producto p : aProductos) {
 		            oos.writeObject(p);
 		        }
+
 		    } catch (IOException e) {
-		        System.out.println("Error al escribir el fichero auxiliar: " + e.getMessage());
+		        System.out.println("Error escribiendo auxiliar: " + e.getMessage());
 		        return;
 		    }
 
-		    // 4. Renombrar original como backup
-		    File backup = new File("backup.dat");
-
-		    // Si ya existe un backup viejo, lo borramos
-		    if (backup.exists()) {
-		        backup.delete();
+		    // 4. Borrar original y renombrar
+		    if (fichero.delete()) {
+		        aux.renameTo(fichero);
+		        System.out.println("Producto modificado correctamente");
+		    } else {
+		        System.out.println("Error al reemplazar el fichero");
 		    }
-
-		    if (!original.renameTo(backup)) {
-		        System.out.println("No se pudo renombrar el fichero original a backup.");
-		        return;
-		    }
-
-		    // 5. Renombrar auxiliar como original
-		    if (!auxiliar.renameTo(original)) {
-		        System.out.println("No se pudo renombrar el fichero auxiliar a productos.dat.");
-		        return;
-		    }
-
-		    // 6. Borrar backup
-		    if (!backup.delete()) {
-		        System.out.println("Advertencia: no se pudo borrar el backup.");
-		    }
-
-		    System.out.println("Producto modificado correctamente.");
 		}
 
+	
+	
 
 	private static void consulta()  {
+File refFichero=new File("producto.dat");
 		
-		    File refFichero = new File("productos.dat");
-
-		    if (!refFichero.exists()) {
-		        System.out.println("No existe el fichero de productos.");
-		        return;
-		    }
-
-		    System.out.println("Introduce el nombre del producto a consultar:");
-		    String nombreBuscado = Util.introducirCadena();
-
-		    boolean encontrado = false;
-
-		    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(refFichero))) {
-
-		        while (true) {
-		            try {
-		                Producto p = (Producto) ois.readObject();
-
-		                if (p.getNombre().equalsIgnoreCase(nombreBuscado)) {
-		                    System.out.println("\nProducto encontrado:");
-		                    System.out.println("Nombre: " + p.getNombre());
-		                    System.out.println("Stock: " + p.getStock());
-		                    encontrado = true;
-		                    break; // dejamos de leer
-		                }
-
-		            } catch (EOFException e) {
-		                break; // fin del fichero
-		            }
-		        }
-
-		        if (!encontrado) {
-		            System.out.println("No existe ningún producto con ese nombre.");
-		        }
-
-		    } catch (IOException e) {
-		        System.out.println("Error de lectura: " + e.getMessage());
-		    } catch (ClassNotFoundException e) {
-		        System.out.println("Error: clase Producto no encontrada.");
-		    }
+		// Lee el fichero
+		if (!refFichero.exists())
+		{
+			System.out.println("Fichero no existente");
 		}
+		else
+		{
+			//pido usuario nombre del producto a buscar
+			System.out.println ("introduce nombre de producto a buscar");
+			String nombreBuscado = Util.introducirCadena();
+			try (FileInputStream fileIStream = new FileInputStream(refFichero);
+		             ObjectInputStream productoIStream = new ObjectInputStream(fileIStream)) 
+			{
+				while (true) {
+					try {
+						Producto aux = (Producto) productoIStream.readObject();
+						if (aux.getNombre().equalsIgnoreCase(nombreBuscado))
+						{
+							System.out.println(aux);  
+						break;
+						}
+					
+					} catch (EOFException eof) {
+						System.out.println("producto no existe");	
+					}
+				}
+
+			} catch (Exception e) {
+				System.out.println("Error de lectura: "+e.getMessage());
+			}
+		}
+	}   
 	
-	}
 	
 	private static void borrado()  {
+		File fichero = new File("producto.dat");
+		 // 1. Leer fichero y volcar a ArrayList
+	    ArrayList<Producto> aProductos = new ArrayList<>();
+
+	    if (!fichero.exists()) {
+	        System.out.println("Fichero no existente");
+	        return;
+	    }
+
+	    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichero))) {
+
+	        while (true) {
+	            try {
+	                Producto p = (Producto) ois.readObject();
+	                aProductos.add(p);
+	            } catch (EOFException eof) {
+	                break; // fin del fichero
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("Error leyendo fichero: " + e.getMessage());
+	        return;
+	    }
+
+	    // 2. Buscar producto y borrar
+	    System.out.println("Introduce nombre del producto a borrar:");
+	    String nombreBuscado = Util.introducirCadena();
+
+	    boolean encontrado = false;
+
+	    Iterator<Producto> it = aProductos.iterator();
+
+	    while (it.hasNext()) {
+	        Producto p = it.next();
+	        if (p.getNombre().equalsIgnoreCase(nombreBuscado)) {
+	            System.out.println("Producto encontrado y eliminado: " + p);
+	            it.remove(); 
+	            encontrado = true;
+	            break;
+	        }
+	    }
+
+	    if (!encontrado) {
+	        System.out.println("Producto no encontrado");
+	        return;
+	    }
+
+
+	    // 3. Volcar en fichero auxiliar
+	    File aux = new File("producto_aux.dat");
+
+	    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(aux))) {
+
+	        for (Producto p : aProductos) {
+	            oos.writeObject(p);
+	        }
+
+	    } catch (IOException e) {
+	        System.out.println("Error escribiendo auxiliar: " + e.getMessage());
+	        return;
+	    }
+
+	    // 4. Borrar original y renombrar
+	    if (fichero.delete()) {
+	        aux.renameTo(fichero);
+	        System.out.println("Producto modificado correctamente");
+	    } else {
+	        System.out.println("Error al reemplazar el fichero");
+	    }
+	}
+
+
 		
-		    File original = new File("productos.dat");
-
-		    if (!original.exists()) {
-		        System.out.println("No existe el fichero de productos.");
-		        return;
-		    }
-
-		    System.out.println("Introduce el nombre del producto a borrar:");
-		    String nombreBuscado = Util.introducirCadena();
-
-		    ArrayList<Producto> lista = new ArrayList<>();
-		    boolean encontrado = false;
-
-		    // 1. Leer todos los productos al ArrayList
-		    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(original))) {
-
-		        while (true) {
-		            try {
-		                Producto p = (Producto) ois.readObject();
-		                lista.add(p);
-		            } catch (EOFException e) {
-		                break; // fin del fichero
-		            }
-		        }
-
-		    } catch (IOException | ClassNotFoundException e) {
-		        System.out.println("Error al leer el fichero: " + e.getMessage());
-		        return;
-		    }
-
-		    // 2. Buscar y eliminar
-		    for (int i = 0; i < lista.size(); i++) {
-		        if (lista.get(i).getNombre().equalsIgnoreCase(nombreBuscado)) {
-		            lista.remove(i);
-		            encontrado = true;
-		            break;
-		        }
-		    }
-
-		    if (!encontrado) {
-		        System.out.println("No existe ningún producto con ese nombre.");
-		        return;
-		    }
-
-		    // 3. Crear fichero auxiliar
-		    File auxiliar = new File("auxiliar.dat");
-
-		    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(auxiliar))) {
-		        for (Producto p : lista) {
-		            oos.writeObject(p);
-		        }
-		    } catch (IOException e) {
-		        System.out.println("Error al escribir el fichero auxiliar: " + e.getMessage());
-		        return;
-		    }
-
-		    // 4. Renombrar original como backup
-		    File backup = new File("backup.dat");
-
-		    if (backup.exists()) {
-		        backup.delete();
-		    }
-
-		    if (!original.renameTo(backup)) {
-		        System.out.println("No se pudo renombrar el fichero original a backup.");
-		        return;
-		    }
-
-		    // 5. Renombrar auxiliar como original
-		    if (!auxiliar.renameTo(original)) {
-		        System.out.println("No se pudo renombrar el fichero auxiliar a productos.dat.");
-		        return;
-		    }
-
-		    // 6. Borrar backup
-		    if (!backup.delete()) {
-		        System.out.println("Advertencia: no se pudo borrar el backup.");
-		    }
-
-		    System.out.println("Producto borrado correctamente.");
-		}
-
-	}
-	private static void ordenarPorNombre() {
 	
-		    File original = new File("productos.dat");
+	private static void ordenarPorNombre() {
 
-		    if (!original.exists()) {
-		        System.out.println("No existe el fichero de productos.");
-		        return;
-		    }
+	    File fichero = new File("producto.dat");
+	    ArrayList<Producto> aProductos = new ArrayList<>();
 
-		    ArrayList<Producto> lista = new ArrayList<>();
+	    if (!fichero.exists()) {
+	        System.out.println("Fichero no existente");
+	        return;
+	    }
 
-		    // 1. Leer todos los productos al ArrayList
-		    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(original))) {
+	    // 1. Leer fichero
+	    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichero))) {
 
-		        while (true) {
-		            try {
-		                Producto p = (Producto) ois.readObject();
-		                lista.add(p);
-		            } catch (EOFException e) {
-		                break; // fin del fichero
-		            }
-		        }
+	        while (true) {
+	            try {
+	                Producto p = (Producto) ois.readObject();
+	                aProductos.add(p);
+	            } catch (EOFException eof) {
+	                break;
+	            }
+	        }
 
-		    } catch (IOException | ClassNotFoundException e) {
-		        System.out.println("Error al leer el fichero: " + e.getMessage());
-		        return;
-		    }
+	    } catch (Exception e) {
+	        System.out.println("Error leyendo fichero: " + e.getMessage());
+	        return;
+	    }
 
-		    // 2. Ordenar por nombre
-		    lista.sort((p1, p2) -> p1.getNombre().compareToIgnoreCase(p2.getNombre()));
+	    // 2. Ordenar usando Comparable
+	    Collections.sort(aProductos);
 
-		    // 3. Crear fichero auxiliar
-		    File auxiliar = new File("auxiliar.dat");
+	    // 3. Volcar en fichero auxiliar
+	    File aux = new File("producto_aux.dat");
 
-		    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(auxiliar))) {
-		        for (Producto p : lista) {
-		            oos.writeObject(p);
-		        }
-		    } catch (IOException e) {
-		        System.out.println("Error al escribir el fichero auxiliar: " + e.getMessage());
-		        return;
-		    }
+	    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(aux))) {
 
-		    // 4. Renombrar original como backup
-		    File backup = new File("backup.dat");
+	        for (Producto p : aProductos) {
+	            oos.writeObject(p);
+	        }
 
-		    if (backup.exists()) {
-		        backup.delete();
-		    }
+	    } catch (IOException e) {
+	        System.out.println("Error escribiendo auxiliar: " + e.getMessage());
+	        return;
+	    }
 
-		    if (!original.renameTo(backup)) {
-		        System.out.println("No se pudo renombrar el fichero original a backup.");
-		        return;
-		    }
-
-		    // 5. Renombrar auxiliar como original
-		    if (!auxiliar.renameTo(original)) {
-		        System.out.println("No se pudo renombrar el fichero auxiliar a productos.dat.");
-		        return;
-		    }
-
-		    // 6. Borrar backup
-		    if (!backup.delete()) {
-		        System.out.println("Advertencia: no se pudo borrar el backup.");
-		    }
-
-		    System.out.println("Listado ordenado correctamente.");
-		}
-
+	    // 4. Borrar original y renombrar
+	    if (fichero.delete()) {
+	        aux.renameTo(fichero);
+	        System.out.println("Productos ordenados correctamente");
+	    } else {
+	        System.out.println("Error al reemplazar el fichero");
+	    }
 	}
+
+
 }

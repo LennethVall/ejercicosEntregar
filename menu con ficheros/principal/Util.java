@@ -1,5 +1,4 @@
-package principal;
-
+package menuFicherosProductos;
 
 import java.io.BufferedReader;
 import java.io.EOFException;

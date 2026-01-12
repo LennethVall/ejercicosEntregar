@@ -1,10 +1,10 @@
-package principal;
+package menuFicherosProductos;
 
+import java.io.Serializable;
 
+public  class Producto implements Serializable, Comparable <Producto>{ 
 
-public  class Producto { 
-
-   
+	   
 
 	public Producto(String nombre,  int stock) {
 		super();
@@ -49,4 +49,22 @@ public  class Producto {
 
 
 
-} 
+
+
+	@Override
+	public String toString() {
+		return "Producto{nombre='" + nombre + "', stock=" + stock + "}"; }
+
+
+
+
+
+	@Override
+	public int compareTo(Producto otro) {
+		// TODO Auto-generated method stub
+		return this.nombre.compareToIgnoreCase(otro.nombre);
+	}
+
+
+
+}
