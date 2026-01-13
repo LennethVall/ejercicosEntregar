@@ -22,7 +22,10 @@ public class LineaFactura implements Facturacion {
     public double getTotalLinea() { return totalLinea; }
 
     @Override
-    public void print() {
-        System.out.println("Producto: " + codigo + " | Cantidad: " + cantidad + " | Total: " + totalLinea);
+    public String toString() {
+        return "Producto: " + codigo +
+           " | Cantidad: " + cantidad +
+           " | Total: " + totalLinea;
     }
 }
+
