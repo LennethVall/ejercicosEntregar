@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
@@ -12,7 +13,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import clases.Socio;
-
+import utilidades.Producto;
+import utilidades.SinCabeceraObjectOutputStream;
 import utilidades.Utilidades;
 public class Main {
 
@@ -108,9 +110,45 @@ public class Main {
 	    	socio.add(nuevo);
 	    	System.out.println("Socio dado de alta correctamente."); 
 	    	System.out.println("Número de socio asignado: " + nuevo.getNumeroSocio());
+	    	
+	    	socioOStream.writeObject(new Socio(nombre, apellidos, DNI, fechaNacimiento, fechaAlta));
+
+			    } catch (IOException e) {
+			        System.out.println("Error de escritura: " + e.getMessage());
+			    }
+
+			} else {
+
+			    // Fichero SÍ existe → añadimos sin cabecera
+			    try (SinCabeceraObjectOutputStream socioOStream =
+			            new SinCabeceraObjectOutputStream(new FileOutputStream(refFichero, true))) {
+
+			    	System.out.println ("Introduce nombre de socio nuevo. ");
+			    	String nombre = Utilidades.introducirCadena("Nombre: ");
+			    	System.out.println ("Introduce apellidos de socio nuevo. ");
+			    	String apellidos = Utilidades.introducirCadena("Apellidos: ");
+			    	System.out.println ("Introduce DNI de socio nuevo. ");
+			    	String DNI = Utilidades.introducirCadena("DNI: ");
+			    	System.out.println ("Introduce fecha de nacimiento de socio nuevo. ");
+			    	LocalDate fechaNacimiento = Utilidades.pidoFechaDMA("fecha de nacimiento: ");
+			    	System.out.println ("Introduce fecha de alta de socio nuevo. ");
+			    	LocalDate fechaAlta = LocalDate.now();
+			    	boolean ok;
+			    	
+			    	Socio nuevo = new Socio(nombre, apellidos, DNI, fechaNacimiento, fechaAlta);
+			    	socio.add(nuevo);
+			    	System.out.println("Socio dado de alta correctamente."); 
+			    	System.out.println("Número de socio asignado: " + nuevo.getNumeroSocio());
+			    	
+			    	socioOStream.writeObject(new Socio(nombre, apellidos, DNI, fechaNacimiento, fechaAlta));
+
+					    } catch (IOException e) {
+					        System.out.println("Error de escritura: " + e.getMessage());
+					    }
+
 			    }
 			}
-	    }
+	    
 	    
 	    public static void listadoSocios() {
 	    	
